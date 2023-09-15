@@ -627,7 +627,7 @@ class PCA9685:
         from adafruit_pca9685 import PCA9685
         from busio import I2C
         from board import SCL, SDA
-        from adafruit_motor import servo, motor
+        from adafruit_motor import servo
 
         print(f"PCA9685 init addr: {address}")
 
@@ -637,7 +637,7 @@ class PCA9685:
         self.pwm.frequency = frequency
         self._frequency = frequency
         self._servo = servo.Servo(self.pwm.channels[0])
-        self._motor = motor.DCMotor(self.pwm.channels[1])
+        self._motor = servo.ContinuousServo(self.pwm.channels[1])
 
     def get_frequency(self):
         return self._frequency
@@ -649,6 +649,7 @@ class PCA9685:
             logger.error(f"Error setting Servo duty cycle: {str(e)}")
 
     def set_motor(self, fraction: float):
+        # fraction = (fraction * 2) - 1
         try:
             self._motor.fraction = fraction
         except Exception as e:
@@ -664,13 +665,14 @@ class PCA9685:
 
         # dont ask me why, I dont know, and Im not bothered
         # somewhere the fraction value is divided by 4096, so lets undo that
-        fraction = min(int(fraction * 4096), 1)
         print(f"fraction: {fraction}")
+        duty = int(fraction * 4096)
+        print(f"duty: {duty}")
 
         if channel == 0:
-            self.set_servo(fraction)
+            self.set_servo(duty)
         elif channel == 1:
-            self.set_motor(fraction)
+            self.set_motor(duty)
         else:
             raise ValueError(
                 f"Only a Servo and Motor are connected, valid channels are 0 and 1, not: {channel}"

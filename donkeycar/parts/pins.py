@@ -624,16 +624,20 @@ class PCA9685:
     """
 
     def __init__(self, busnum: int, address: int, frequency: int):
-        from adafruit_pca9685 import PCA9685
         from busio import I2C
         from board import SCL, SDA
+
+        try:
+            i2c_bus = I2C(SCL, SDA)
+            self.pwm = PCA9685(i2c_bus, address=address)
+        except Exception as e:
+            logger.error(f"failed to instantiate I2C bus for PCA9865, with error: {str(e)}")
+
+        from adafruit_pca9685 import PCA9685
         from adafruit_motor import servo
 
-        print(f"PCA9685 init addr: {address}")
-
         # Initialise the PCA9685 using the default address (0x40).
-        i2c_bus = I2C(SCL, SDA)
-        self.pwm = PCA9685(i2c_bus)
+
         self.pwm.frequency = frequency
         self._frequency = frequency
         self._servo = servo.Servo(self.pwm.channels[0])
@@ -665,9 +669,8 @@ class PCA9685:
 
         # dont ask me why, I dont know, and Im not bothered
         # somewhere the fraction value is divided by 4096, so lets undo that
-        print(f"fraction: {fraction}")
         duty = int(fraction * 4096)
-        print(f"duty: {duty}")
+        logger.info(f"PCA9865 command {duty:.4f} on ch: {channel}")
 
         if channel == 0:
             self.set_servo(duty)

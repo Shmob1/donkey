@@ -677,7 +677,7 @@ class PCA9685:
         # and we get a pwm signal from 0 - 1500 & we only need a fraction
         duty = int(fraction * 4096) / 1500
 
-        logger.info(f"PCA9865 command {duty:.4f} on ch: {channel}")
+        # logger.info(f"PCA9865 command {duty:.4f} on ch: {channel}")
 
         if channel == 0:
             self.set_servo(duty)

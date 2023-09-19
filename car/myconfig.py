@@ -20,7 +20,7 @@
 # MAX_LOOPS = None        # the vehicle loop can abort after this many iterations, when given a positive integer.
 #
 # #CAMERA
-# CAMERA_TYPE = "PICAM"   # (PICAM|WEBCAM|CVCAM|CSIC|V4L|D435|MOCK|IMAGE_LIST)
+CAMERA_TYPE = "CSIC"  # (PICAM|WEBCAM|CVCAM|CSIC|V4L|D435|MOCK|IMAGE_LIST)
 # IMAGE_W = 160
 # IMAGE_H = 120
 # IMAGE_DEPTH = 3         # default RGB=3, make 1 for mono
@@ -95,10 +95,10 @@ PCA9685_I2C_BUSNUM = None  # None will auto detect, which is fine on the pi. But
 STEERING_CHANNEL = 0  # (deprecated) channel on the 9685 pwm board 0-15
 STEERING_LEFT_PWM = 550  # pwm value for full left steering
 STEERING_RIGHT_PWM = 950  # pwm value for full right steering
- THROTTLE_CHANNEL = 1            #(deprecated) channel on the 9685 pwm board 0-15
- THROTTLE_FORWARD_PWM = 580      #pwm value for max forward throttle
- THROTTLE_STOPPED_PWM = 680      #pwm value for no movement
- THROTTLE_REVERSE_PWM = 800      #pwm value for max reverse throttle
+THROTTLE_CHANNEL = 1  # (deprecated) channel on the 9685 pwm board 0-15
+THROTTLE_FORWARD_PWM = 580  # pwm value for max forward throttle
+THROTTLE_STOPPED_PWM = 680  # pwm value for no movement
+THROTTLE_REVERSE_PWM = 800  # pwm value for max reverse throttle
 #
 # #
 # # PIGPIO_PWM (deprecated in favor of PWM_STEERING_THROTTLE)
@@ -551,7 +551,11 @@ STEERING_RIGHT_PWM = 950  # pwm value for full right steering
 # NUM_LAST_LAYERS_TO_TRAIN = 7        #when freezing layers, how many layers from the last should be allowed to train?
 #
 # #WEB CONTROL
-# WEB_CONTROL_PORT = int(os.getenv("WEB_CONTROL_PORT", 8887))  # which port to listen on when making a web controller
+import os
+
+WEB_CONTROL_PORT = int(
+    os.getenv("WEB_CONTROL_PORT", 8887)
+)  # which port to listen on when making a web controller
 # WEB_INIT_MODE = "user"              # which control mode to start in. one of user|local_angle|local. Setting local will start in ai mode.
 #
 # #JOYSTICK

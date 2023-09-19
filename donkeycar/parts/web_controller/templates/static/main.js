@@ -1,48 +1,48 @@
-var driveHandler = new function() {
+var driveHandler = new function () {
   //functions used to drive the vehicle. 
 
   var state = {
-      'tele': {
-          "user": {
-              'angle': 0,
-              'throttle': 0,
-          },
-          "pilot": {
-              'angle': 0,
-              'throttle': 0,
-          }
+    'tele': {
+      "user": {
+        'angle': 0,
+        'throttle': 0,
       },
-      'brakeOn': true,
-      'recording': false,
-      'driveMode': "user",
-      'pilot': 'None',
-      'session': 'None',
-      'lag': 0,
-      'controlMode': 'gamepad',
-      'maxThrottle' : 1,
-      'throttleMode' : 'user',
-      'buttons': {
-          "w1": false,  // boolean; true is 'down' or pushed, false is 'up' or not pushed
-          "w2": false,
-          "w3": false,
-          "w4": false,
-          "w5": false,
+      "pilot": {
+        'angle': 0,
+        'throttle': 0,
       }
+    },
+    'brakeOn': true,
+    'recording': false,
+    'driveMode': "user",
+    'pilot': 'None',
+    'session': 'None',
+    'lag': 0,
+    'controlMode': 'gamepad',
+    'maxThrottle': 1,
+    'throttleMode': 'user',
+    'buttons': {
+      "w1": false,  // boolean; true is 'down' or pushed, false is 'up' or not pushed
+      "w2": false,
+      "w3": false,
+      "w4": false,
+      "w5": false,
+    }
   }
 
   var joystick_options = {}
-  var joystickLoopRunning=false;
+  var joystickLoopRunning = false;
 
   var hasGamepad = false;
 
-  var deviceHasOrientation=false;
+  var deviceHasOrientation = false;
   var initialGamma;
 
   var vehicle_id = ""
   var driveURL = ""
   var socket
 
-  this.load = function() {
+  this.load = function () {
     driveURL = '/drive'
     socket = new WebSocket('ws://' + location.host + '/wsDrive');
 
@@ -61,7 +61,7 @@ var driveHandler = new function() {
     var manager = nipplejs.create(joystick_options);
     bindNipple(manager)
 
-    if(!!navigator.getGamepads){
+    if (!!navigator.getGamepads) {
       console.log("Device has gamepad support.")
       hasGamepad = true;
     }
@@ -83,31 +83,31 @@ var driveHandler = new function() {
   // the state; it will not add new fields that
   // may exist in the data but not the state.
   //
-  var updateState = function(state, data) {
-      let changed = false;
-      if(typeof data === 'object') {
-          const keys = Object.keys(data)
-          keys.forEach(key => {
-              //
-              // state must already have the key;
-              // we are not adding new fields to the state,
-              // we are only updating existing fields.
-              //
-              if(state.hasOwnProperty(key) && state[key] !== data[key]) {
-                  if(typeof state[key] === 'object') {
-                      // recursively update the state's object field
-                      changed = updateState(state[key], data[key]) && changed;
-                  } else {
-                      state[key] = data[key];
-                      changed = true;
-                  }
-              }
-          });
-      }
-      return changed;
+  var updateState = function (state, data) {
+    let changed = false;
+    if (typeof data === 'object') {
+      const keys = Object.keys(data)
+      keys.forEach(key => {
+        //
+        // state must already have the key;
+        // we are not adding new fields to the state,
+        // we are only updating existing fields.
+        //
+        if (state.hasOwnProperty(key) && state[key] !== data[key]) {
+          if (typeof state[key] === 'object') {
+            // recursively update the state's object field
+            changed = updateState(state[key], data[key]) && changed;
+          } else {
+            state[key] = data[key];
+            changed = true;
+          }
+        }
+      });
+    }
+    return changed;
   }
 
-  var setBindings = function() {
+  var setBindings = function () {
     //
     // when server sends a message with state changes
     // then update our local state and 
@@ -116,22 +116,22 @@ var driveHandler = new function() {
     socket.onmessage = function (event) {
       console.log(event.data);
       const data = JSON.parse(event.data);
-      if(updateState(state, data)) {
-          updateUI();
+      if (updateState(state, data)) {
+        updateUI();
       }
     };
 
-    $(document).keydown(function(e) {
-        if(e.which == 32) { toggleBrake() }  // 'space'  brake
-        if(e.which == 82) { toggleRecording() }  // 'r'  toggle recording
-        if(e.which == 73) { throttleUp() }  // 'i'  throttle up
-        if(e.which == 75) { throttleDown() } // 'k'  slow down
-        if(e.which == 74) { angleLeft() } // 'j' turn left
-        if(e.which == 76) { angleRight() } // 'l' turn right
-        if(e.which == 65) { updateDriveMode('local') } // 'a' turn on local mode (full _A_uto)
-        if(e.which == 85) { updateDriveMode('user') } // 'u' turn on manual mode (_U_user)
-        if(e.which == 83) { updateDriveMode('local_angle') } // 's' turn on local mode (auto _S_teering)
-        if(e.which == 77) { toggleDriveMode() } // 'm' toggle drive mode (_M_ode)
+    $(document).keydown(function (e) {
+      if (e.which == 32) { toggleBrake() }  // 'space'  brake
+      if (e.which == 82) { toggleRecording() }  // 'r'  toggle recording
+      if (e.which == 73) { throttleUp() }  // 'i'  throttle up
+      if (e.which == 75) { throttleDown() } // 'k'  slow down
+      if (e.which == 74) { angleLeft() } // 'j' turn left
+      if (e.which == 76) { angleRight() } // 'l' turn right
+      if (e.which == 65) { updateDriveMode('local') } // 'a' turn on local mode (full _A_uto)
+      if (e.which == 85) { updateDriveMode('user') } // 'u' turn on manual mode (_U_user)
+      if (e.which == 83) { updateDriveMode('local_angle') } // 's' turn on local mode (auto _S_teering)
+      if (e.which == 77) { toggleDriveMode() } // 'm' toggle drive mode (_M_ode)
     });
 
     $('#mode_select').on('change', function () {
@@ -150,11 +150,11 @@ var driveHandler = new function() {
       toggleRecording();
     });
 
-    $('#brake_button').click(function() {
+    $('#brake_button').click(function () {
       toggleBrake();
     });
 
-    $('input[type=radio][name=controlMode]').change(function() {
+    $('input[type=radio][name=controlMode]').change(function () {
       if (this.value == 'joystick') {
         state.controlMode = "joystick";
         joystickLoopRunning = true;
@@ -178,12 +178,12 @@ var driveHandler = new function() {
     });
 
     // programmable buttons
-    $('#button_bar > button').mousedown(function() {
+    $('#button_bar > button').mousedown(function () {
       console.log(`${$(this).attr('id')} mousedown`);
       state.buttons[$(this).attr('id')] = true;
       postDrive(["buttons"]); // write it back to the server
     });
-    $('#button_bar > button').mouseup(function() {
+    $('#button_bar > button').mouseup(function () {
       console.log(`${$(this).attr('id')} mouseup`);
       state.buttons[$(this).attr('id')] = false;
       postDrive(["buttons"]); // write it back to the server
@@ -192,25 +192,25 @@ var driveHandler = new function() {
 
 
   function bindNipple(manager) {
-    manager.on('start', function(evt, data) {
+    manager.on('start', function (evt, data) {
       state.tele.user.angle = 0
       state.tele.user.throttle = 0
       state.recording = true
-      joystickLoopRunning=true;
+      joystickLoopRunning = true;
       joystickLoop();
 
-    }).on('end', function(evt, data) {
-      joystickLoopRunning=false;
+    }).on('end', function (evt, data) {
+      joystickLoopRunning = false;
       brake()
 
-    }).on('move', function(evt, data) {
+    }).on('move', function (evt, data) {
       state.brakeOn = false;
       radian = data['angle']['radian']
       distance = data['distance']
 
       //console.log(data)
-      state.tele.user.angle = Math.max(Math.min(Math.cos(radian)/70*distance, 1), -1)
-      state.tele.user.throttle = limitedThrottle(Math.max(Math.min(Math.sin(radian)/70*distance , 1), -1))
+      state.tele.user.angle = Math.max(Math.min(Math.cos(radian) / 70 * distance, 1), -1)
+      state.tele.user.throttle = limitedThrottle(Math.max(Math.min(Math.sin(radian) / 70 * distance, 1), -1))
 
       if (state.tele.user.throttle < .001) {
         state.tele.user.angle = 0
@@ -219,7 +219,7 @@ var driveHandler = new function() {
     });
   }
 
-  var updateUI = function() {
+  var updateUI = function () {
     $("#throttleInput").val(state.tele.user.throttle);
     $("#angleInput").val(state.tele.user.angle);
     $('#mode_select').val(state.driveMode);
@@ -232,7 +232,7 @@ var driveHandler = new function() {
     $('#throttle_label').html(throttleRounded);
     $('#steering_label').html(steeringRounded);
 
-    if(state.tele.user.throttle < 0) {
+    if (state.tele.user.throttle < 0) {
       $('#throttle-bar-backward').css('width', throttlePercent).html(throttleRounded)
       $('#throttle-bar-forward').css('width', '0%').html('')
     }
@@ -245,7 +245,7 @@ var driveHandler = new function() {
       $('#throttle-bar-backward').css('width', '0%').html('')
     }
 
-    if(state.tele.user.angle < 0) {
+    if (state.tele.user.angle < 0) {
       $('#angle-bar-backward').css('width', steeringPercent).html(steeringRounded)
       $('#angle-bar-forward').css('width', '0%').html('')
     }
@@ -282,7 +282,7 @@ var driveHandler = new function() {
         .addClass('btn-danger').end()
     }
 
-    if(deviceHasOrientation) {
+    if (deviceHasOrientation) {
       $('#tilt-toggle').removeAttr("disabled")
       $('#tilt').removeAttr("disabled")
     } else {
@@ -290,7 +290,7 @@ var driveHandler = new function() {
       $('#tilt').prop("disabled", true);
     }
 
-    if(hasGamepad) {
+    if (hasGamepad) {
       $('#gamepad-toggle').removeAttr("disabled")
       $('#gamepad').removeAttr("disabled")
     } else {
@@ -325,45 +325,45 @@ var driveHandler = new function() {
   // Set any changed properties to the server
   // via the websocket connection
   //
-  var postDrive = function(fields=[]) {
+  var postDrive = function (fields = []) {
 
-      if(fields.length === 0) {
-          fields = ALL_POST_FIELDS;
-      }
+    if (fields.length === 0) {
+      fields = ALL_POST_FIELDS;
+    }
 
-      let data = {}
-      fields.forEach(field => {
-          switch (field) {
-              case 'angle': data['angle'] = state.tele.user.angle; break;
-              case 'throttle': data['throttle'] = state.tele.user.throttle; break;
-              case 'brake': data['brake'] = 1; break;
-              case 'drive_mode': data['drive_mode'] = state.driveMode; break;
-              case 'recording': data['recording'] = state.recording; break;
-              case 'buttons': data['buttons'] = state.buttons; break;
-              default: console.log(`Unexpected post field: '${field}'`); break;
-          }
-      });
-      if(data) {
-          let json_data = JSON.stringify(data);
-          console.log(`Posting ${json_data}`);
-          socket.send(json_data)
-          updateUI()
+    let data = {}
+    fields.forEach(field => {
+      switch (field) {
+        case 'angle': data['angle'] = state.tele.user.angle; break;
+        case 'throttle': data['throttle'] = state.tele.user.throttle; break;
+        case 'brake': data['brake'] = 1; break;
+        case 'drive_mode': data['drive_mode'] = state.driveMode; break;
+        case 'recording': data['recording'] = state.recording; break;
+        case 'buttons': data['buttons'] = state.buttons; break;
+        default: console.log(`Unexpected post field: '${field}'`); break;
       }
+    });
+    if (data) {
+      let json_data = JSON.stringify(data);
+      console.log(`Posting ${json_data}`);
+      socket.send(json_data)
+      updateUI()
+    }
   };
 
-  var applyDeadzone = function(number, threshold){
-     percentage = (Math.abs(number) - threshold) / (1 - threshold);
+  var applyDeadzone = function (number, threshold) {
+    percentage = (Math.abs(number) - threshold) / (1 - threshold);
 
-     if(percentage < 0)
-        percentage = 0;
+    if (percentage < 0)
+      percentage = 0;
 
-     return percentage * (number > 0 ? 1 : -1);
+    return percentage * (number > 0 ? 1 : -1);
   }
 
 
 
   function gamePadLoop() {
-    setTimeout(gamePadLoop,100);
+    setTimeout(gamePadLoop, 100);
 
     if (state.controlMode != "gamepad") {
       return;
@@ -371,46 +371,44 @@ var driveHandler = new function() {
 
     var gamepads = navigator.getGamepads();
 
-    for (var i = 0; i < gamepads.length; ++i)
-      {
-        var pad = gamepads[i];
-        // some pads are NULL I think.. some aren't.. use one that isn't null
-        if (pad && pad.timestamp!=0)
-        {
+    for (var i = 0; i < gamepads.length; ++i) {
+      var pad = gamepads[i];
+      // some pads are NULL I think.. some aren't.. use one that isn't null
+      if (pad && pad.timestamp != 0) {
 
-          var joystickX = applyDeadzone(pad.axes[0], 0.05);
-          var joystickY = pad.buttons[7].value;
-          var joystickZ = pad.buttons[6].value;
+        var joystickX = applyDeadzone(pad.axes[0], 0.05);
+        var joystickY = pad.buttons[7].value;
+        var joystickZ = pad.buttons[6].value;
 
-          if (joystickZ  !== 0) {
-            state.brakeOn = true;
-          } else {
-            state.brakeOn = false;
-          }
-
-          state.tele.user.angle = joystickX;
-
-          state.tele.user.throttle = joystickY - joystickZ;
-
-          postDrive();
-
-          console.log("Steering: ", state.tele.user.angle, "Throttle: ", state.tele.user.throttle)
-
+        if (joystickZ !== 0) {
+          state.brakeOn = true;
+        } else {
+          state.brakeOn = false;
         }
-          // todo; simple demo of displaying pad.axes and pad.buttons
+
+        state.tele.user.angle = joystickX;
+
+        state.tele.user.throttle = joystickY - joystickZ;
+
+        postDrive();
+
+        console.log("Steering: ", state.tele.user.angle, "Throttle: ", state.tele.user.throttle)
+
       }
+      // todo; simple demo of displaying pad.axes and pad.buttons
     }
+  }
 
 
   // Send control updates to the server every .1 seconds.
-  function joystickLoop () {
-     setTimeout(function () {
-          postDrive()
+  function joystickLoop() {
+    setTimeout(function () {
+      postDrive()
 
-        if (joystickLoopRunning && state.controlMode == "joystick") {
-           joystickLoop();
-        }
-     }, 100)
+      if (joystickLoopRunning && state.controlMode == "joystick") {
+        joystickLoop();
+      }
+    }, 100)
   }
 
   // Control throttle and steering with device orientation
@@ -431,11 +429,11 @@ var driveHandler = new function() {
 
     updateUI();
 
-    if(state.controlMode != "tilt" || !deviceHasOrientation || state.brakeOn){
+    if (state.controlMode != "tilt" || !deviceHasOrientation || state.brakeOn) {
       return;
     }
 
-    if(!initialGamma && gamma) {
+    if (!initialGamma && gamma) {
       initialGamma = gamma;
     }
 
@@ -456,66 +454,66 @@ var driveHandler = new function() {
     state.tele.user.angle = newAngle;
   }
 
-  function deviceOrientationLoop () {
-     setTimeout(function () {
-        if(!state.brakeOn){
-          postDrive()
-        }
+  function deviceOrientationLoop() {
+    setTimeout(function () {
+      if (!state.brakeOn) {
+        postDrive()
+      }
 
-        if (state.controlMode == "tilt") {
-          deviceOrientationLoop();
-        }
-     }, 100)
+      if (state.controlMode == "tilt") {
+        deviceOrientationLoop();
+      }
+    }, 100)
   }
 
-  var throttleUp = function(){
+  var throttleUp = function () {
     state.tele.user.throttle = limitedThrottle(Math.min(state.tele.user.throttle + .05, 1));
     postDrive()
   };
 
-  var throttleDown = function(){
+  var throttleDown = function () {
     state.tele.user.throttle = limitedThrottle(Math.max(state.tele.user.throttle - .05, -1));
     postDrive()
   };
 
-  var angleLeft = function(){
+  var angleLeft = function () {
     state.tele.user.angle = Math.max(state.tele.user.angle - .1, -1)
     postDrive()
   };
 
-  var angleRight = function(){
+  var angleRight = function () {
     state.tele.user.angle = Math.min(state.tele.user.angle + .1, 1)
     postDrive()
   };
 
-  var updateDriveMode = function(mode){
+  var updateDriveMode = function (mode) {
     state.driveMode = mode;
     postDrive(["drive_mode"])
   };
 
-  var toggleDriveMode = function() {
-    switch(state.driveMode) {
+  var toggleDriveMode = function () {
+    switch (state.driveMode) {
       case "user": {
-          updateDriveMode("local_angle");
-          break;
+        updateDriveMode("local_angle");
+        break;
       }
       case "local_angle": {
-          updateDriveMode("local");
-          break;
+        updateDriveMode("local");
+        break;
       }
       default: {
-          updateDriveMode("user");
-          break;
+        updateDriveMode("user");
+        break;
       }
     }
   }
 
-  var toggleRecording = function(){
+  var toggleRecording = function () {
     state.recording = !state.recording
     postDrive(['recording']);
   };
 
-  var toggleBrake = function(){
+  var toggleBrake = function () {
     state.brakeOn = !state.brakeOn;
     initialGamma = null;
 
@@ -524,13 +522,13 @@ var driveHandler = new function() {
     }
   };
 
-  var brake = function(i){
-        console.log('post drive: ' + i)
-        state.tele.user.angle = 0
-        state.tele.user.throttle = 0
-        state.recording = false
-        state.driveMode = 'user';
-        postDrive()
+  var brake = function (i) {
+    console.log('post drive: ' + i)
+    state.tele.user.angle = 0
+    state.tele.user.throttle = 0
+    state.recording = false
+    state.driveMode = 'user';
+    postDrive()
 
     i++
     if (i < 5) {
@@ -544,7 +542,7 @@ var driveHandler = new function() {
     updateUI();
   };
 
-  var limitedThrottle = function(newThrottle){
+  var limitedThrottle = function (newThrottle) {
     var limitedThrottle = 0;
 
     if (newThrottle > 0) {
@@ -590,7 +588,7 @@ var driveHandler = new function() {
   //
   // };
 
-  var betaToSteering = function(beta, gamma) {
+  var betaToSteering = function (beta, gamma) {
     const deadZone = 5;
     var angle = 0.0;
     var outsideDeadZone = false;
@@ -638,7 +636,7 @@ var driveHandler = new function() {
     return angle * controlDirection;
   };
 
-  var gammaToThrottle = function(gamma) {
+  var gammaToThrottle = function (gamma) {
     var throttle = 0.0;
     var gamma180 = gamma + 90;
     var initialGamma180 = initialGamma + 90;
@@ -657,7 +655,7 @@ var driveHandler = new function() {
     minReverse = Math.max(minReverse, 0);
     maxReverse = Math.min(maxReverse, 180);
 
-    if(gamma180 > minForward && gamma180 < maxForward) {
+    if (gamma180 > minForward && gamma180 < maxForward) {
       // gamma in forward range
       if (controlDirection == -1) {
         throttle = remap(gamma180, minForward, maxForward, 1.0, 0.0);
@@ -668,7 +666,7 @@ var driveHandler = new function() {
       // gamma in reverse range
       if (controlDirection == -1) {
         throttle = remap(gamma180, minReverse, maxReverse, 0.0, -1.0);
-      } else  {
+      } else {
         throttle = remap(gamma180, minReverse, maxReverse, -1.0, 0.0);
       }
     }
@@ -679,48 +677,47 @@ var driveHandler = new function() {
 }();
 
 
-function toRadians (angle) {
-return angle * (Math.PI / 180);
+function toRadians(angle) {
+  return angle * (Math.PI / 180);
 }
 
-function remap( x, oMin, oMax, nMin, nMax ){
-//range check
-if (oMin == oMax){
+function remap(x, oMin, oMax, nMin, nMax) {
+  //range check
+  if (oMin == oMax) {
     console.log("Warning: Zero input range");
     return None;
-};
+  };
 
-if (nMin == nMax){
+  if (nMin == nMax) {
     console.log("Warning: Zero output range");
     return None
-}
+  }
 
-//check reversed input range
-var reverseInput = false;
-oldMin = Math.min( oMin, oMax );
-oldMax = Math.max( oMin, oMax );
-if (oldMin != oMin){
+  //check reversed input range
+  var reverseInput = false;
+  oldMin = Math.min(oMin, oMax);
+  oldMax = Math.max(oMin, oMax);
+  if (oldMin != oMin) {
     reverseInput = true;
-}
+  }
 
-//check reversed output range
-var reverseOutput = false;
-newMin = Math.min( nMin, nMax )
-newMax = Math.max( nMin, nMax )
-if (newMin != nMin){
+  //check reversed output range
+  var reverseOutput = false;
+  newMin = Math.min(nMin, nMax)
+  newMax = Math.max(nMin, nMax)
+  if (newMin != nMin) {
     reverseOutput = true;
-};
+  };
 
-var portion = (x-oldMin)*(newMax-newMin)/(oldMax-oldMin)
-if (reverseInput){
-    portion = (oldMax-x)*(newMax-newMin)/(oldMax-oldMin);
-};
+  var portion = (x - oldMin) * (newMax - newMin) / (oldMax - oldMin)
+  if (reverseInput) {
+    portion = (oldMax - x) * (newMax - newMin) / (oldMax - oldMin);
+  };
 
-var result = portion + newMin
-if (reverseOutput){
+  var result = portion + newMin
+  if (reverseOutput) {
     result = newMax - portion;
-}
+  }
 
-return result;
+  return result;
 }
-

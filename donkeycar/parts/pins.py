@@ -626,17 +626,18 @@ class PCA9685:
     def __init__(self, busnum: int, address: int, frequency: int):
         from busio import I2C
         from board import SCL, SDA
+        from adafruit_pca9685 import PCA9685
 
+        # Initialise the PCA9685 using the default address (0x40).
         try:
             i2c_bus = I2C(SCL, SDA)
             self.pwm = PCA9685(i2c_bus, address=address)
         except Exception as e:
-            logger.error(f"failed to instantiate I2C bus for PCA9865, with error: {str(e)}")
+            logger.error(
+                f"failed to instantiate I2C bus for PCA9865, with error: {str(e)}"
+            )
 
-        from adafruit_pca9685 import PCA9685
         from adafruit_motor import servo
-
-        # Initialise the PCA9685 using the default address (0x40).
 
         self.pwm.frequency = frequency
         self._frequency = frequency
@@ -650,14 +651,18 @@ class PCA9685:
         try:
             self._servo.fraction = fraction
         except Exception as e:
-            logger.error(f"Error setting Servo duty cycle: {str(e)}")
+            logger.error(
+                f"Error setting Servo duty cycle to {fraction}, with error: {e}"
+            )
 
     def set_motor(self, fraction: float):
         # fraction = (fraction * 2) - 1
         try:
             self._motor.fraction = fraction
         except Exception as e:
-            logger.error(f"Error setting Motor duty cycle: {str(e)}")
+            logger.error(
+                f"Error setting Motor duty cycle to {fraction}, with error: {e}"
+            )
 
     def set_duty_cycle(self, channel: int, fraction: float):
         """
@@ -669,7 +674,9 @@ class PCA9685:
 
         # dont ask me why, I dont know, and Im not bothered
         # somewhere the fraction value is divided by 4096, so lets undo that
-        duty = int(fraction * 4096)
+        # and we get a pwm signal from 0 - 1500 & we only need a fraction
+        duty = int(fraction * 4096) / 1500
+
         logger.info(f"PCA9865 command {duty:.4f} on ch: {channel}")
 
         if channel == 0:

@@ -20,9 +20,9 @@
 # MAX_LOOPS = None        # the vehicle loop can abort after this many iterations, when given a positive integer.
 #
 # #CAMERA
-CAMERA_TYPE = "CSIC"  # (PICAM|WEBCAM|CVCAM|CSIC|V4L|D435|MOCK|IMAGE_LIST)
-# IMAGE_W = 160
-# IMAGE_H = 120
+CAMERA_TYPE = "V4L"  # (PICAM|WEBCAM|CVCAM|CSIC|V4L|D435|MOCK|IMAGE_LIST)
+IMAGE_W = 224
+IMAGE_H = 224
 # IMAGE_DEPTH = 3         # default RGB=3, make 1 for mono
 # CAMERA_FRAMERATE = DRIVE_LOOP_HZ
 # CAMERA_VFLIP = False
@@ -75,27 +75,28 @@ PCA9685_I2C_BUSNUM = None  # None will auto detect, which is fine on the pi. But
 # # Uses a PwmPin for steering (servo) and a second PwmPin for throttle (ESC)
 # # Base PWM Frequence is presumed to be 60hz; use PWM_xxxx_SCALE to adjust pulse with for non-standard PWM frequencies
 # #
-# PWM_STEERING_THROTTLE = {
-#     "PWM_STEERING_PIN": "PCA9685.1:40.1",   # PWM output pin for steering servo
-#     "PWM_STEERING_SCALE": 1.0,              # used to compensate for PWM frequency differents from 60hz; NOT for adjusting steering range
-#     "PWM_STEERING_INVERTED": False,         # True if hardware requires an inverted PWM pulse
-#     "PWM_THROTTLE_PIN": "PCA9685.1:40.0",   # PWM output pin for ESC
-#     "PWM_THROTTLE_SCALE": 1.0,              # used to compensate for PWM frequence differences from 60hz; NOT for increasing/limiting speed
-#     "PWM_THROTTLE_INVERTED": False,         # True if hardware requires an inverted PWM pulse
-#     "STEERING_LEFT_PWM": 460,               #pwm value for full left steering
-#     "STEERING_RIGHT_PWM": 290,              #pwm value for full right steering
-#     "THROTTLE_FORWARD_PWM": 500,            #pwm value for max forward throttle
-#     "THROTTLE_STOPPED_PWM": 370,            #pwm value for no movement
-#     "THROTTLE_REVERSE_PWM": 220,            #pwm value for max reverse throttle
-# }
+
+PWM_STEERING_THROTTLE = {
+    "PWM_STEERING_PIN": "PCA9685.1:40.0",  # PWM output pin for steering servo
+    "PWM_STEERING_SCALE": 1.0,  # used to compensate for PWM frequency differents from 60hz; NOT for adjusting steering range
+    "PWM_STEERING_INVERTED": False,  # True if hardware requires an inverted PWM pulse
+    "PWM_THROTTLE_PIN": "PCA9685.1:40.1",  # PWM output pin for ESC
+    "PWM_THROTTLE_SCALE": 1.0,  # used to compensate for PWM frequence differences from 60hz; NOT for increasing/limiting speed
+    "PWM_THROTTLE_INVERTED": False,  # True if hardware requires an inverted PWM pulse
+    "STEERING_LEFT_PWM": 550,  # pwm value for full left steering
+    "STEERING_RIGHT_PWM": 950,  # pwm value for full right steering
+    "THROTTLE_FORWARD_PWM": 580,  # pwm value for max forward throttle
+    "THROTTLE_STOPPED_PWM": 680,  # pwm value for no movement
+    "THROTTLE_REVERSE_PWM": 800,  # pwm value for max reverse throttle
+}
+
 #
-# #
-# # I2C_SERVO (deprecated in favor of PWM_STEERING_THROTTLE)
-# #
-STEERING_CHANNEL = 0  # (deprecated) channel on the 9685 pwm board 0-15
+# I2C_SERVO (deprecated in favor of PWM_STEERING_THROTTLE)
+#
+# STEERING_CHANNEL = 0  # (deprecated) channel on the 9685 pwm board 0-15
 STEERING_LEFT_PWM = 550  # pwm value for full left steering
 STEERING_RIGHT_PWM = 950  # pwm value for full right steering
-THROTTLE_CHANNEL = 1  # (deprecated) channel on the 9685 pwm board 0-15
+# THROTTLE_CHANNEL = 1  # (deprecated) channel on the 9685 pwm board 0-15
 THROTTLE_FORWARD_PWM = 580  # pwm value for max forward throttle
 THROTTLE_STOPPED_PWM = 680  # pwm value for no movement
 THROTTLE_REVERSE_PWM = 800  # pwm value for max reverse throttle
@@ -379,7 +380,7 @@ THROTTLE_REVERSE_PWM = 800  # pwm value for max reverse throttle
 # CREATE_TF_LITE = True           # automatically create tflite model in training
 # CREATE_TENSOR_RT = False        # automatically create tensorrt model in training
 # SAVE_MODEL_AS_H5 = False        # if old keras format should be used instead of savedmodel
-# CACHE_IMAGES = True             # if images are cached in training for speed up
+CACHE_IMAGES = False  # if images are cached in training for speed up
 #
 # PRUNE_CNN = False               #This will remove weights from your model. The primary goal is to increase performance.
 # PRUNE_PERCENT_TARGET = 75       # The desired percentage of pruning.

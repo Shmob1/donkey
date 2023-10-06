@@ -216,19 +216,15 @@ class CSICamera(BaseCamera):
         self,
         capture_width=3280,
         capture_height=2464,
-        output_width=224,
-        output_height=224,
-        framerate=21,
+        output_width=720,
+        output_height=1280,
+        framerate=60,
         flip_method=0,
     ):
         return (
-            f"nvarguscamerasrc ! "
-            f"video/x-raw(memory:NVMM), width={capture_width}, height={capture_height}, "
-            f"format=(string)NV12, framerate=(fraction){framerate}/1 !"
-            f"nvvidconv flip-method={flip_method} ! "
-            f"video/x-raw, width=(int){output_width}, height=(int){output_height}, format=(string)BGRx ! "
-            f"videoconvert ! "
-            f"video/x-raw, format=(string)BGR ! appsink drop=1"
+            f"nvarguscamerasrc ! video/x-raw(memory:NVMM), width={capture_width}, height={capture_height}, "
+            "format=NV12, framerate=(fraction)30/1 ! "
+            f"nvvidconv flip-method={2} ! video/x-raw, format=I420 ! appsink drop=1"
         )
 
     def __init__(
@@ -270,7 +266,7 @@ class CSICamera(BaseCamera):
         )
 
         # initialize the camera and stream
-        self.camera = cv2.VideoCapture(gstream, cv2.CAP_GSTREAMER)
+        self.camera = cv2.VideoCapture(gstream)
 
         if self.camera and self.camera.isOpened():
             logger.info("CSICamera opened...")
@@ -295,7 +291,7 @@ class CSICamera(BaseCamera):
 
         self.ret, frame = self.camera.read()
         if frame is not None:
-            self.frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
+            self.frame = cv2.cvtColor(frame, cv2.COLOR_YUV2RGB_I420)
 
     def run(self):
         self.poll_camera()
